@@ -5,6 +5,7 @@
         public MyLinkedList<T> List;
         public MyLinkedListItem<T> Next;
         public MyLinkedListItem<T> Previous;
+
         public T Data { get; private set; }
 
         public MyLinkedListItem(T data)
@@ -14,8 +15,8 @@
 
         public void Invalidate()
         {
-            Next = null;
-            Previous = null;
+            this.Next = null;
+            this.Previous = null;
         }
     }
 }

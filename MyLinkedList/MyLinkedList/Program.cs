@@ -1,7 +1,6 @@
 ﻿namespace MyLinkedList
 {
     using System;
-    using System.Threading;
 
     class Program
     {
@@ -18,17 +17,16 @@
                 Console.WriteLine($"foreach {i}");
             }
 
-            list.AddAfter(list.First,10);
+            list.AddAfter(list.First, 10);
             list.AddBefore(list.First, 10);
-            list.AddBefore(list.Last,99);
+            list.AddBefore(list.Last, 99);
             list.AddFirst(0);
             list.AddLast(9);
-            
+
             foreach (var i in list)
             {
                 Console.WriteLine($"foreach {i}");
             }
-
 
             var iterator = list.First;
             do

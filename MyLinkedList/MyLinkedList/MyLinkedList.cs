@@ -1,19 +1,21 @@
 ﻿namespace MyLinkedList
 {
     using System;
-    using System.Diagnostics;
     using System.Collections.Generic;
-    using System.Collections;
+    using System.Diagnostics;
 
     public class MyLinkedList<T>
     {
         private MyLinkedList<T> list;
 
         public int Count { get; private set; }
+
         public MyLinkedListItem<T> First { get; private set; }
+
         public MyLinkedListItem<T> Last { get => this.First?.Previous; private set { } }
         
-        public MyLinkedList() {
+        public MyLinkedList()
+        {
             this.list = this;
         }
 
@@ -26,27 +28,28 @@
 
             foreach (T item in collection)
             {
-                AddLast(item);
+               this.AddLast(item);
             }
-            list = this;
+
+            this.list = this;
         }
 
         public void AddAfter(MyLinkedListItem<T> item, T value)
         {
-            ValidateItem(item);
+            this.ValidateItem(item);
             var newItem = new MyLinkedListItem<T>(value);
-            InsertNodeBefore(item.Next, newItem);
+            this.InsertNodeBefore(item.Next, newItem);
             newItem.List = this;
         }
 
         public void AddBefore(MyLinkedListItem<T> item, T value)
         {
-            ValidateItem(item);
+            this.ValidateItem(item);
             var newListElement = new MyLinkedListItem<T>(value);
-            InsertNodeBefore(item, newListElement);
-            if (item == First)
+            this.InsertNodeBefore(item, newListElement);
+            if (item == this.First)
             {
-                First = newListElement;
+                this.First = newListElement;
             }
 
             newListElement.List = this;
@@ -56,14 +59,14 @@
         {
             var newListElement = new MyLinkedListItem<T>(value);
 
-            if (First == null)
+            if (this.First == null)
             {
-                InsertNodeToEmptyList(newListElement);
+                this.InsertNodeToEmptyList(newListElement);
             }
             else
             {
-                InsertNodeBefore(First, newListElement);
-                First = newListElement;
+                this.InsertNodeBefore(this.First, newListElement);
+                this.First = newListElement;
             }
 
             newListElement.List = this;
@@ -73,13 +76,13 @@
         {
             var newListElement = new MyLinkedListItem<T>(value);
 
-            if (First == null)
+            if (this.First == null)
             {
-                InsertNodeToEmptyList(newListElement);
+                this.InsertNodeToEmptyList(newListElement);
             }
             else
             {
-                InsertNodeBefore(First, newListElement);
+                this.InsertNodeBefore(this.First, newListElement);
             }
             
             newListElement.List = this;
@@ -87,7 +90,7 @@
 
         public void Clear()
         {
-            MyLinkedListItem<T> current = First;
+            MyLinkedListItem<T> current = this.First;
             while (current != null)
             {
                 MyLinkedListItem<T> temp = current;
@@ -95,8 +98,8 @@
                 temp.Invalidate();
             }
 
-            First = null;
-            Count = 0;
+            this.First = null;
+            this.Count = 0;
         }
 
         public Enumerator GetEnumerator()
@@ -115,33 +118,34 @@
             internal Enumerator(MyLinkedList<T> list)
             {
                 this.list = list;
-                node = list.First;
-                Current = default(T);
-                index = 0;
+                this.node = list.First;
+                this.Current = default(T);
+                this.index = 0;
             }
             
             public bool MoveNext()
             {
-                if (node == null)
+                if (this.node == null)
                 {
-                    index = list.Count + 1;
+                    this.index = this.list.Count + 1;
                     return false;
                 }
 
-                index++;
-                Current = node.Data;
-                node = node.Next;
-                if (node == list.First)
+                this.index++;
+                this.Current = this.node.Data;
+                this.node = this.node.Next;
+                if (this.node == this.list.First)
                 {
-                    node = null;
+                    this.node = null;
                 }
+
                 return true;
             }
         }
 
         public void Remove(MyLinkedListItem<T> itemToRemove)
         {
-            ValidateItem(itemToRemove);
+            this.ValidateItem(itemToRemove);
             var curent = this.First;
 
             do
@@ -157,10 +161,12 @@
                         curent.Previous.Next = curent.Next;
                         curent.Next.Previous = curent.Previous;
                     }
-                    Count--;
+
+                    this.Count--;
                     curent = null;
                     break;
                 }
+
                 curent = curent.Next;
             }
             while (this.First != curent);
@@ -179,24 +185,26 @@
             }
         }
 
-        private void InsertNodeBefore(MyLinkedListItem<T> item,
+        private void InsertNodeBefore(
+                                      MyLinkedListItem<T> item,
                                       MyLinkedListItem<T> newItem)
         {
             newItem.Next = item;
             newItem.Previous = item.Previous;
             item.Previous.Next = newItem;
             item.Previous = newItem;
-            Count++;
+            this.Count++;
         }
         
         private void InsertNodeToEmptyList(MyLinkedListItem<T> item)
         {
-            Debug.Assert(First == null && Count == 0, 
+            Debug.Assert(
+                        this.First == null && this.Count == 0, 
                         "LinkedList must be empty when this method is called!");
-            First = item;
-            First.Next = item;
-            First.Previous = item;
-            Count++;
+            this.First = item;
+            this.First.Next = item;
+            this.First.Previous = item;
+            this.Count++;
         }
     }
 }
