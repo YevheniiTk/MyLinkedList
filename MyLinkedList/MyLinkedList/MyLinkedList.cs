@@ -3,20 +3,18 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.Contracts;
 
     public class MyLinkedList<T>
     {
-        private MyLinkedList<T> list;
-
         public int Count { get; private set; }
 
         public MyLinkedListItem<T> First { get; private set; }
 
-        public MyLinkedListItem<T> Last { get => this.First?.Previous; private set { } }
-        
+        public MyLinkedListItem<T> Last { get => this.First?.Previous; }
+
         public MyLinkedList()
         {
-            this.list = this;
         }
 
         public MyLinkedList(IEnumerable<T> collection)
@@ -28,10 +26,8 @@
 
             foreach (T item in collection)
             {
-               this.AddLast(item);
+                this.AddLast(item);
             }
-
-            this.list = this;
         }
 
         public void AddAfter(MyLinkedListItem<T> item, T value)
@@ -39,7 +35,14 @@
             this.ValidateItem(item);
             var newItem = new MyLinkedListItem<T>(value);
             this.InsertNodeBefore(item.Next, newItem);
-            newItem.List = this;
+        }
+
+        public void AddAfter(T item, T value)
+        {
+            MyLinkedListItem<T> current = this.Find(item);
+            this.ValidateItem(current);
+            var newItem = new MyLinkedListItem<T>(value);
+            this.InsertNodeBefore(current.Next, newItem);
         }
 
         public void AddBefore(MyLinkedListItem<T> item, T value)
@@ -51,8 +54,18 @@
             {
                 this.First = newListElement;
             }
+        }
 
-            newListElement.List = this;
+        public void AddBefore(T item, T value)
+        {
+            MyLinkedListItem<T> current = this.Find(item);
+            this.ValidateItem(current);
+            var newListElement = new MyLinkedListItem<T>(value);
+            this.InsertNodeBefore(current, newListElement);
+            if (current == this.First)
+            {
+                this.First = newListElement;
+            }
         }
 
         public void AddFirst(T value)
@@ -68,8 +81,6 @@
                 this.InsertNodeBefore(this.First, newListElement);
                 this.First = newListElement;
             }
-
-            newListElement.List = this;
         }
 
         public void AddLast(T value)
@@ -84,8 +95,6 @@
             {
                 this.InsertNodeBefore(this.First, newListElement);
             }
-            
-            newListElement.List = this;
         }
 
         public void Clear()
@@ -95,11 +104,54 @@
             {
                 MyLinkedListItem<T> temp = current;
                 current = current.Next;
-                temp.Invalidate();
+                temp.ResetLinks();
             }
 
             this.First = null;
             this.Count = 0;
+        }
+
+        public bool Contains(T value)
+        {
+            return this.Find(value) != null;
+        }
+
+        public MyLinkedListItem<T> Find(T value)
+        {
+            MyLinkedListItem<T> item = this.First;
+            EqualityComparer<T> c = EqualityComparer<T>.Default;
+
+            if (item != null)
+            {
+                if (value != null)
+                {
+                    do
+                    {
+                        if (c.Equals(item.Data, value))
+                        {
+                            return item;
+                        }
+
+                        item = item.Next;
+                    }
+                    while (item != this.First);
+                }
+                else
+                {
+                    do
+                    {
+                        if (item.Data == null)
+                        {
+                            return item;
+                        }
+
+                        item = item.Next;
+                    }
+                    while (item != this.First);
+                }
+            }
+
+            return null;
         }
 
         public Enumerator GetEnumerator()
@@ -112,8 +164,8 @@
             private MyLinkedList<T> list;
             private MyLinkedListItem<T> node;
             private int index;
-            
-            public T Current { get; private set; } 
+
+            public T Current { get; private set; }
 
             internal Enumerator(MyLinkedList<T> list)
             {
@@ -122,7 +174,7 @@
                 this.Current = default(T);
                 this.index = 0;
             }
-            
+
             public bool MoveNext()
             {
                 if (this.node == null)
@@ -178,29 +230,22 @@
             {
                 throw new ArgumentNullException("item");
             }
-
-            if (item.List != this)
-            {
-                throw new InvalidOperationException($"Current list does not contain this item: {item}");
-            }
         }
 
         private void InsertNodeBefore(
                                       MyLinkedListItem<T> item,
                                       MyLinkedListItem<T> newItem)
         {
-            newItem.Next = item;
-            newItem.Previous = item.Previous;
-            item.Previous.Next = newItem;
-            item.Previous = newItem;
+            MyLinkedListItem<T>.InsertNodeBefore(item, newItem);
             this.Count++;
         }
-        
+
         private void InsertNodeToEmptyList(MyLinkedListItem<T> item)
         {
-            Debug.Assert(
-                        this.First == null && this.Count == 0, 
+            Contract.Assert(
+                        this.First == null && this.Count == 0,
                         "LinkedList must be empty when this method is called!");
+
             this.First = item;
             this.First.Next = item;
             this.First.Previous = item;
