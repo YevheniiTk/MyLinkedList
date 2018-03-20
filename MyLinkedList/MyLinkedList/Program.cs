@@ -6,22 +6,21 @@
     {
         static void Main(string[] args)
         {
-            var collection = new[] { 1, 2, 3, 4, 5, 6 };
+            var collection = new[] { 1, 3, 5, 7 };
             var list = new MyLinkedList<int>(collection);
-
-            var item = list.First.Next.Next;
-            list.Remove(item);
 
             foreach (var i in list)
             {
                 Console.WriteLine($"foreach {i}");
             }
 
-            list.AddAfter(list.First, 10);
-            list.AddBefore(list.First, 10);
-            list.AddBefore(list.Last, 99);
-            list.AddFirst(0);
-            list.AddLast(9);
+            Console.WriteLine($"===================");
+            list.AddAfter(1, 2);
+            list.AddAfter(3, 4);
+            list.AddAfter(5, 6);
+
+            Console.WriteLine(list.Contains(5));
+            Console.WriteLine(list.Contains(25));
 
             foreach (var i in list)
             {
@@ -35,6 +34,8 @@
                 iterator = iterator.Next;
             }
             while (list.First != iterator);
+
+            list.Clear();
         }
     }
 }
